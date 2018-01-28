@@ -1,0 +1,11 @@
+{
+ "name": "express-diagnostics-common",
+  "autoload": {
+    "psr-4": {
+      "": [
+        "classes/",
+        "classes/Exception/"
+      ]
+    }
+  }
+}
