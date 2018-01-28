@@ -26,7 +26,7 @@ class Member {
     /**
      * @var array
      */
-    protected $data;
+    public $data;
 
     /**
      * Member constructor.
