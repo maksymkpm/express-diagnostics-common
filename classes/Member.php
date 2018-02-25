@@ -48,31 +48,6 @@ class Member {
 	}
 
     /**
-     * @param array $data
-     * @return Member|null
-     */
-    public static function Auth(array $data = []): ?Member {
-		if (!isset($data['profile'])) {
-			throw new \RuntimeException('Unknown profile type.');
-		}
-
-		switch ($data['profile']) {
-			case 'vk':
-				$result = self::AuthVK($data['vk_member_id']);
-				break;
-		}
-
-		try {
-			Log::MemberLogin([
-				'member_id' => $result->data['member_id'],
-				'profile' => $data['profile'],
-			]);
-		} catch (Exception $e) {}
-
-		return $result;
-	}
-
-    /**
      * @param $vk_member_id
      * @return Member|null
      */
@@ -268,11 +243,34 @@ class Member {
 		return $result['member_id'];
 	}
 
+//
+	public static function Auth(string $username, string $password): ?Member {
+		$query = "	SELECT member_id, sname, fname, lname 
+					FROM members
+					WHERE username = :username AND
+						password = :password
+					";
+
+		$memberData = self::Database()
+					->select($query)
+					->binds(':username', $username)
+					->binds(':password', $password)
+					->execute()
+					->fetch();
+
+		if (empty($memberData)) {
+			return null;
+		}
+
+		return new self($memberData);
+	}
+	
+	
     /**
      * @return db
      */
     public static function Database(): \db {
-		$db = \db::connect('issue');
+		$db = \db::connect('default');
 		$db->query('SET NAMES utf8');
 		
 		return $db;
