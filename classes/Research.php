@@ -3,7 +3,7 @@
  * Class Research
  */
 class Research {
-    protected $data;
+    public $data;
 
     /**
      * Research constructor.
