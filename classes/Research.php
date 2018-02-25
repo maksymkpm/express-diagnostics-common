@@ -18,7 +18,7 @@ class Research {
 	}
 	
 		public static function GetResearch(): ?Research {
-		$query = "	SELECT * FROM papers
+		$query = "	SELECT research_id, paper_id, paper_name FROM papers
 					WHERE online = :online";
 
 		$researchData = self::Database()
