@@ -17,7 +17,7 @@ class Research {
 		$this->data = $data;
 	}
 	
-		public static function GetResearch(int $research_id): ?Research {
+		public static function GetResearch(): ?Research {
 		$query = "	SELECT * FROM papers
 					WHERE online = :online";
 
