@@ -40,12 +40,27 @@ class Research {
 					LEFT JOIN variants v ON q.question_id = v.question_id 
 					WHERE q.paper_id = :paper_id";
 
-		$researchData = self::Database()
+		$questionsData = self::Database()
 					->select($query)
 					->binds(':paper_id', $paper_id)
 					->execute()
 					->fetch_all();
-
+		
+		$query = "	SELECT p.paper_description, r.image
+					FROM `papers` p
+					LEFT JOIN researches r ON r.research_id = p.research_id
+					WHERE p.paper_id = :paper_id";
+		
+		$paperData = self::Database()
+					->select($query)
+					->binds(':paper_id', $paper_id)
+					->execute()
+					->fetch();
+		
+		$researchData = [];
+		$researchData['paper'] = $paperData;
+		$researchData['questions'] = $questionsData;
+		
 		if (empty($researchData)) {
 			return null;
 		}
