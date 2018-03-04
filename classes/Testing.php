@@ -39,19 +39,19 @@ class Testing {
 		//заключение по координирующему комплексу
 		if ($score == 0) {
 			$summary = config::get('recommendation.1.perfect');
-			$settings = ["good" => 1, "middle" => 0.3, "bad" => 0.3];
+			$settings = ["good" => ":)", "middle" => "", "bad" => ""];
 		}
 		elseif (($score > 0) && ($score <= 0.33)) {
 			$summary = config::get('recommendation.1.good');
-			$settings = ["good" => 1, "middle" => 0.5, "bad" => 0.3];
+			$settings = ["good" => ":)", "middle" => "", "bad" => ""];
 		}
 		elseif (($score > 0.33) && ($score <= 0.66)) {
 			$summary = config::get('recommendation.1.middle');
-			$settings = ["good" => 0.5, "middle" => 1, "bad" => 0.5];
+			$settings = ["good" => "", "middle" => ":|", "bad" => ""];
 		}
 		elseif (($score > 0.66) && ($score <= 1)) {
 			$summary = config::get('recommendation.1.bad');
-			$settings = ["good" => 0.3, "middle" => 0.5, "bad" => 1];
+			$settings = ["good" => "", "middle" => "", "bad" => ":("];
 		}
 		
 		return '
@@ -59,9 +59,9 @@ class Testing {
 		<div>Заключение: ' . $summary . '</div>
 		<table width="100%">
 			<tr>
-				<td width="100px" style="color: greed; height: 30px; opacity: ' . $settings["good"] . '">&nbsp;</td>
-				<td width="100px" style="color: yellow; height: 30px; opacity: ' . $settings["middle"] . '">&nbsp;</td>
-				<td width="100px" style="color: red; height: 30px; opacity: ' . $settings["bad"] . '">&nbsp;</td>
+				<td width="100px" style="align: center; color: white; font-size: 36px; background-color: green; height: 30px;">' . $settings['good'] . '</td>
+				<td width="100px" style="align: center; color: black; font-size: 36px; background-color: yellow; height: 30px;">' . $settings['middle'] . '</td>
+				<td width="100px" style="align: center; color: white; font-size: 36px; background-color: red; height: 30px;">' . $settings['bad'] . '</td>
 			</tr>
 		</table>
 		<div>		
