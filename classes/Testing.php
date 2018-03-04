@@ -89,4 +89,3 @@ class Testing {
 			</div>';
 	}
 }
-s
