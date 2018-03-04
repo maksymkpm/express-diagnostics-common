@@ -30,7 +30,7 @@ class Testing {
 	}
 	
 	public static function scoreForSlider($score) {
-		return int ($score * 100);
+		return ($score * 100);
 	}
 	
 	public static function returnResults($score) {
