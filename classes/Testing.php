@@ -26,7 +26,7 @@ class Testing {
 			$score = (16 - $scoreData['score']) / 16;
 		}
 
-		return self::returnResults($score);
+		return self::returnResults($score * 100);
 	}
 	
 	public static function returnResults($score) {
