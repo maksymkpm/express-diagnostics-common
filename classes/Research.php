@@ -60,8 +60,16 @@ class Research {
 		
 		$researchData = [];
 		$researchData['paper'] = $paperData;
+		$researchData['general'] = [];
 		
+		$i = 0;
 		foreach ($questionsData as $question) {
+			$i++;
+			
+			if ($i == 1) {
+				$researchData['general']['paper_start_question'] = $question['question_id'];
+			}
+			
 			$researchData['questions'][$question['question_id']] = [
 				'question' => $question['question'],
 				'answers' => [],
