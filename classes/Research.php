@@ -59,7 +59,17 @@ class Research {
 		
 		$researchData = [];
 		$researchData['paper'] = $paperData;
-		$researchData['questions'] = $questionsData;
+		
+		foreach ($questionsData as $question) {
+			$researchData['questions'][$question['question_id']] = [
+				'question' => $question['question'],
+				'answers' => [],
+			];
+		}
+
+		foreach ($questionsData as $variant) {
+			$researchData['questions'][$variant['question_id']]['answers'][$variant['variant_id']] = $variant['variant_text'];
+		}
 		
 		if (empty($researchData)) {
 			return null;
