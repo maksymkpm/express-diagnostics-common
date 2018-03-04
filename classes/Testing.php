@@ -15,7 +15,7 @@ class Testing {
 					FROM variants
 					WHERE variant_id IN (" . $answers . ")";
 
-		return $scoreData = self::Database()
+		$scoreData = self::Database()
 					->select($query)
 					->execute()
 					->fetch();
