@@ -59,9 +59,9 @@ class Testing {
 		<div>Заключение: ' . $summary . '</div>
 		<table width="100%">
 			<tr>
-				<td width="100px" style="align: center; color: white; font-size: 36px; background-color: green; height: 30px;">' . $settings['good'] . '</td>
-				<td width="100px" style="align: center; color: black; font-size: 36px; background-color: yellow; height: 30px;">' . $settings['middle'] . '</td>
-				<td width="100px" style="align: center; color: white; font-size: 36px; background-color: red; height: 30px;">' . $settings['bad'] . '</td>
+				<td width="100px" style="text-align: center; color: white; font-size: 36px; background-color: green; height: 30px;">' . $settings['good'] . '</td>
+				<td width="100px" style="text-align: center; color: black; font-size: 36px; background-color: yellow; height: 30px;">' . $settings['middle'] . '</td>
+				<td width="100px" style="text-align: center; color: white; font-size: 36px; background-color: red; height: 30px;">' . $settings['bad'] . '</td>
 			</tr>
 		</table>
 		<div>		
