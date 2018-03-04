@@ -9,15 +9,14 @@ class Testing {
 	}
 
 	public static function Paper1(string $answers) {
+		$answers = substr($answers, 0, -1);
+		
 		$query = "	SELECT SUM(weight) AS score
 					FROM variants
-					WHERE variant_id IN (:answers)";
+					WHERE variant_id IN (" . $answers . ")";
 
-		$answers = substr($answers, 0, -1);
-
-		$scoreData = self::Database()
+		return $scoreData = self::Database()
 					->select($query)
-					->binds(':answers', $answers)
 					->execute()
 					->fetch();
 		
