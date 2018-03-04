@@ -59,9 +59,9 @@ class Testing {
 		<div>Заключение: ' . $summary . '</div>
 		<table width="100%">
 			<tr>
-				<td width="33%" style="color: greed; height: 30px; opacity: ' . $settings["good"] . '"></td>
-				<td width="33%" style="color: yellow; height: 30px; opacity: ' . $settings["middle"] . '"></td>
-				<td width="33%" style="color: red; height: 30px; opacity: ' . $settings["bad"] . '"></td>
+				<td width="100px" style="color: greed; height: 30px; opacity: ' . $settings["good"] . '">&nbsp;</td>
+				<td width="100px" style="color: yellow; height: 30px; opacity: ' . $settings["middle"] . '">&nbsp;</td>
+				<td width="100px" style="color: red; height: 30px; opacity: ' . $settings["bad"] . '">&nbsp;</td>
 			</tr>
 		</table>
 		<div>		
