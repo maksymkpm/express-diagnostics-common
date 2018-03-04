@@ -8,7 +8,7 @@ class Testing {
 		return $db;
 	}
 	
-	public static function Paper1(array $answers) {
+	public static function Paper1(string $answers) {
 		$query = "	SELECT SUM(weight) AS score
 					FROM variants
 					WHERE variant_id IN (:answers)";
