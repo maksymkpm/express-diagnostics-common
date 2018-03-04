@@ -38,7 +38,8 @@ class Research {
 		$query = "	SELECT q.question_id, q.question, v.variant_id, v.variant_text 
 					FROM `questions` q
 					LEFT JOIN variants v ON q.question_id = v.question_id 
-					WHERE q.paper_id = :paper_id";
+					WHERE q.paper_id = :paper_id
+					ORDER BY q.question_id ASC";
 
 		$questionsData = self::Database()
 					->select($query)
