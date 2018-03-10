@@ -16,6 +16,7 @@ class Testing {
 			case 7: $score = self::CalculateCommonPaper($paper_id, self::substrString($answers)); break;
 			
 			case 9: $score = self::CalculateAbstract($paper_id, self::substrString($answers)); break;
+			case 10: $score = self::CalculateMemory($paper_id, self::substrString($answers)); break;
 
 			case 3: 
 			case 5:
@@ -82,6 +83,21 @@ class Testing {
 		
 		foreach ($answers as $key => $value) {
 			if ($value == $correct_answers[$key]) {
+				$score++;
+			}
+		}
+		
+		return self::CalculateScore($paper_id, $score);
+	}
+	
+	private static function CalculateMemory($paper_id, string $answers) {
+		$correct_answers = [23,34,53,72,48,36,85,17,16,84];
+
+		$answers = array_unique(explode(',', $answers));
+		$score = 0;
+		
+		foreach ($answers as $key => $value) {
+			if (in_array($value, $correct_answers)) {
 				$score++;
 			}
 		}
@@ -205,7 +221,7 @@ class Testing {
 
 	// тесты без вложенностей
 	private static function simplePapers() {
-		return [1,2,4,7,9];
+		return [1,2,4,7,9,10];
 	}
 
 	// тесты с вложенностью
