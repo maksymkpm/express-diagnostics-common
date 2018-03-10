@@ -15,9 +15,10 @@ class Testing {
 			case 4:
 			case 7: $score = self::CalculateCommonPaper($paper_id, self::substrString($answers)); break;
 
-			case 8: $score = self::CalculatePerception($paper_id, self::substrString($answers)); break;
+			case 8: $score = self::CalculatePerception($paper_id, $answers); break;
 			case 9: $score = self::CalculateAbstract($paper_id, self::substrString($answers)); break;
 			case 10: $score = self::CalculateMemory($paper_id, self::substrString($answers)); break;
+			case 11: $score = self::CalculateAttention($paper_id, $answers); break;
 
 			case 3:
 			case 5:
@@ -108,6 +109,8 @@ class Testing {
 
 	private static function CalculatePerception($paper_id, string $answers) {
 		$score = 0;
+		
+		$answers = $answers / 10;
 
 		if ($answers < 5) {
 			$score = 1;
@@ -138,6 +141,10 @@ class Testing {
 		}
 
 		return $score;
+	}
+	
+	private static function CalculateAttention($paper_id, $answers) {
+		return self::CalculateScore($paper_id, $answers);
 	}
 
 	private static function CalculateScore($paper_id, $scoreRaw) {
