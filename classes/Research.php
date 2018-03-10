@@ -47,7 +47,7 @@ class Research {
 					->execute()
 					->fetch_all();
 		
-		$query = "	SELECT p.paper_name, p.paper_description, r.image
+		$query = "	SELECT p.paper_name, p.paper_description, r.image, r.research_id
 					FROM `papers` p
 					LEFT JOIN researches r ON r.research_id = p.research_id
 					WHERE p.paper_id = :paper_id";

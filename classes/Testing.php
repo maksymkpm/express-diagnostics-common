@@ -292,4 +292,21 @@ class Testing {
 
 		return $response;
 	}
+	
+	public static function SaveResults() {
+		$data = [
+			'member_id' => ,
+			'research_id' => ,
+			'paper_id' => ,
+			'result_text' => ,
+			'score' => ,
+			'date' => \db::expression('UTC_TIMESTAMP()'),
+			'attempt' => ,
+		];
+
+		return $response = self::Database()
+			->insert('personal_results')
+			->values($data)
+			->execute();
+	}
 }
