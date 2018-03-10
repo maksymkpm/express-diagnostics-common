@@ -27,7 +27,21 @@ class Testing {
 			default: break;
 		}
 
-		return self::returnResults($paper_id, $score);
+		$response = self::returnResults($paper_id, $score);
+		//var_dump($_SESSION);
+		$data = [
+			'member_id' => $_SESSION['member']['member_id'],
+			'research_id' => $_SESSION['research']['research_id'],
+			'paper_id' => $paper_id,
+			'result_text' => $response['summary'],
+			'score' => $response['score'],
+			'date' => \db::expression('UTC_TIMESTAMP()'),
+			'attempt' => 1,
+		];
+		
+		self::SaveResults($data);
+		
+		return $response['response'];
 	}
 
 	private static function CalculateCommonPaper($paper_id, string $answers) {
@@ -290,20 +304,14 @@ class Testing {
 			$response = str_replace($placeholder, $value, $response);
 		}
 
-		return $response;
+		return [
+			'score' => $score,
+			'summary' => $summary,
+			'response' => $response
+		];
 	}
 	
-	public static function SaveResults() {
-		$data = [
-			'member_id' => ,
-			'research_id' => ,
-			'paper_id' => ,
-			'result_text' => ,
-			'score' => ,
-			'date' => \db::expression('UTC_TIMESTAMP()'),
-			'attempt' => ,
-		];
-
+	private static function SaveResults(array $data) {
 		return $response = self::Database()
 			->insert('personal_results')
 			->values($data)
