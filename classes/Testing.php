@@ -12,6 +12,7 @@ class Testing {
 		switch ($paper_id) {
 			case 1:
 			case 2:
+			case 4:
 			case 7: $score = self::CalculateCommonPaper($paper_id, self::substrString($answers)); break;
 
 			default: break;
@@ -37,6 +38,7 @@ class Testing {
 		switch ($paper_id) {
 			case 1: $score_max = 16; break;
 			case 2: $score_max = 13; break;
+			case 4: $score_max = 35; break;
 			case 7: $score_max = 7; break;
 		}
 
