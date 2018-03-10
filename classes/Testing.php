@@ -17,6 +17,7 @@ class Testing {
 
 			case 3: 
 			case 5:
+			case 6:
 			$score = self::CalculateComplexPaper($paper_id, self::substrString($answers)); break;
 
 			default: break;
@@ -131,9 +132,9 @@ class Testing {
 
 				$final_score = $final_score + $score[$i];
 			}
-var_dump($score);
+//var_dump($score);
 			$final_score = $final_score / config::get('recommendation.' . $paper_id . '.parts');
-var_dump($final_score);
+//var_dump($final_score);
 			if ($final_score == 0) {
 				$summary = config::get('recommendation.' . $paper_id . '.general.perfect') . $summary;
 				$settings = ["good" => ":)", "middle" => "", "bad" => ""];
@@ -193,7 +194,7 @@ var_dump($final_score);
 
 	// тесты с вложенностью
 	private static function complexPapers() {
-		return [3,5];
+		return [3,5,6];
 	}
 
 	/*
