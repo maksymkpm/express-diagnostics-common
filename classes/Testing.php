@@ -14,11 +14,12 @@ class Testing {
 			case 2:
 			case 4:
 			case 7: $score = self::CalculateCommonPaper($paper_id, self::substrString($answers)); break;
-			
+
+			case 8: $score = self::CalculatePerception($paper_id, self::substrString($answers)); break;
 			case 9: $score = self::CalculateAbstract($paper_id, self::substrString($answers)); break;
 			case 10: $score = self::CalculateMemory($paper_id, self::substrString($answers)); break;
 
-			case 3: 
+			case 3:
 			case 5:
 			case 6: $score = self::CalculateComplexPaper($paper_id, self::substrString($answers)); break;
 
@@ -57,7 +58,7 @@ class Testing {
 		}
 
 		$score = [];
-		for ($i = 1; $i <= config::get('recommendation.' . $paper_id . '.parts'); $i++) {	
+		for ($i = 1; $i <= config::get('recommendation.' . $paper_id . '.parts'); $i++) {
 			$part = implode(',', $group[$i]);
 
 			$query = "	SELECT SUM(weight) AS score
@@ -74,35 +75,69 @@ class Testing {
 
 		return self::CalculateScore($paper_id, $score);
 	}
-	
+
 	private static function CalculateAbstract($paper_id, string $answers) {
 		$correct_answers = [21,6,3,29,4];
-		
+
 		$answers = explode(',', $answers);
 		$score = 0;
-		
+
 		foreach ($answers as $key => $value) {
 			if ($value == $correct_answers[$key]) {
 				$score++;
 			}
 		}
-		
+
 		return self::CalculateScore($paper_id, $score);
 	}
-	
+
 	private static function CalculateMemory($paper_id, string $answers) {
 		$correct_answers = [23,34,53,72,48,36,85,17,16,84];
 
 		$answers = array_unique(explode(',', $answers));
 		$score = 0;
-		
+
 		foreach ($answers as $key => $value) {
 			if (in_array($value, $correct_answers)) {
 				$score++;
 			}
 		}
-		
+
 		return self::CalculateScore($paper_id, $score);
+	}
+
+	private static function CalculatePerception($paper_id, string $answers) {
+		$score = 0;
+
+		if ($answers < 5) {
+			$score = 1;
+		}
+
+		if (($answers >= 5) && ($answers < 9.5)){
+			$score = (9.5 - $answers)/4.5;
+		}
+
+		if ($answers == 9.5) {
+			$score = 0;
+		}
+
+		if (($answers > 9.5) && ($answers < 10.5)) {
+			$score = 0;
+		}
+
+		if ($answers == 10.5) {
+			$score = 0;
+		}
+
+		if (($answers > 10.5) && ($answers <= 15)){
+			$score = ($answers - 10.5)/4.5;
+		}
+
+		if ($answers > 15) {
+			$score = 1;
+		}
+
+		return $score;
 	}
 
 	private static function CalculateScore($paper_id, $scoreRaw) {
@@ -204,7 +239,7 @@ class Testing {
 
 		return $score;
 	}
-	
+
 	private static function countSpecialScore($scoreRaw) {
 		if ($scoreRaw <= 5) {
 			$score = (5 - $scoreRaw)/5;
@@ -215,13 +250,13 @@ class Testing {
 		elseif (($scoreRaw > 7) && ($scoreRaw <= 12)){
 			$score = ($scoreRaw - 7)/5;
 		}
-		
+
 		return $score;
 	}
 
 	// тесты без вложенностей
 	private static function simplePapers() {
-		return [1,2,4,7,9,10];
+		return [1,2,4,7,8,9,10,11];
 	}
 
 	// тесты с вложенностью
@@ -241,13 +276,13 @@ class Testing {
 			'{middle}' => $settings['middle'],
 			'{bad}' => $settings['bad'],
 		];
-		
+
 		$response = file_get_contents('../templates/test_result.html', true);
-		
+
 		foreach ($replace as $placeholder => $value) {
 			$response = str_replace($placeholder, $value, $response);
 		}
-		
+
 		return $response;
 	}
 }
