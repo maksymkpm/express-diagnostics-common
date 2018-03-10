@@ -11,7 +11,8 @@ class Testing {
 	public static function CountResults($paper_id, string $questions, string $answers) {
 		switch ($paper_id) {
 			case 1:
-			case 2: $score = self::CalculateCommonPaper($paper_id, self::substrString($answers)); break;
+			case 2:
+			case 7: $score = self::CalculateCommonPaper($paper_id, self::substrString($answers)); break;
 
 			default: break;
 		}
@@ -36,6 +37,7 @@ class Testing {
 		switch ($paper_id) {
 			case 1: $score_max = 16; break;
 			case 2: $score_max = 13; break;
+			case 7: $score_max = 7; break;
 		}
 
 		if ($scoreRaw > $score_max ) {
@@ -80,7 +82,7 @@ class Testing {
 	*/
 	private static function returnSummary($score, $summary, $settings) {
 		return '
-			<div>Индекс здоровья координирующего комплекса: ' . $score . '. </div>
+			<div>Результаты тестирования: ' . $score . '. </div>
 			<div>Заключение: ' . $summary . '</div>
 			<table width="100%">
 				<tr>
