@@ -8,35 +8,19 @@ class Testing {
 		return $db;
 	}
 
-	public static function Paper1(string $answers) {
-		$answers = substr($answers, 0, -1);
-		
-		$query = "	SELECT SUM(weight) AS score
-					FROM variants
-					WHERE variant_id IN (" . $answers . ")";
-
-		$scoreData = self::Database()
-					->select($query)
-					->execute()
-					->fetch();
-		
-		if ($scoreData['score'] > 16) {
-			$score = 0;
-		} else {
-			$score = (16 - $scoreData['score']) / 16;
+	public static function CountResults($paper_id, string $questions, string $answers) {
+		switch ($paper_id) {
+			case 1: $score = self::CalculatePaper1(self::substrString($answers)); break;
+			
+			default: break;
 		}
 
-		return self::returnResults($score);
+		return self::returnResults($paper_id, $score);
 	}
-	
-	public static function scoreForSlider($score) {
-		return ($score * 100);
-	}
-	
-	public static function returnResults($score) {
+
+	private static function returnResults($paper_id, $score) {
 		$summary = '';
-		
-		//заключение по координирующему комплексу
+
 		if ($score == 0) {
 			$summary = config::get('recommendation.1.perfect');
 			$settings = ["good" => ":)", "middle" => "", "bad" => ""];
@@ -53,21 +37,52 @@ class Testing {
 			$summary = config::get('recommendation.1.bad');
 			$settings = ["good" => "", "middle" => "", "bad" => ":("];
 		}
-		
+
+		return self::returnSummary($score, $summary, $settings);
+	}
+
+	private static function CalculatePaper1(string $answers) {
+		$query = "	SELECT SUM(weight) AS score
+					FROM variants
+					WHERE variant_id IN (" . $answers . ")";
+
+		$scoreData = self::Database()
+					->select($query)
+					->execute()
+					->fetch();
+
+		if ($scoreData['score'] > 16) {
+			$score = 0;
+		} else {
+			$score = (16 - $scoreData['score']) / 16;
+		}
+
+		return $score;
+	}
+
+	private static function substrString(string $string) {
+		return substr($string, 0, -1);
+	}
+
+	/*
+	* returns summary to customer
+
+	*/
+	private static function returnSummary($score, $summary, $settings) {
 		return '
-		<div>Индекс здоровья координирующего комплекса: ' . $score . '. </div>
-		<div>Заключение: ' . $summary . '</div>
-		<table width="100%">
-			<tr>
-				<td width="100px" style="text-align: center; color: white; font-size: 36px; background-color: green; height: 30px;">' . $settings['good'] . '</td>
-				<td width="100px" style="text-align: center; color: black; font-size: 36px; background-color: yellow; height: 30px;">' . $settings['middle'] . '</td>
-				<td width="100px" style="text-align: center; color: white; font-size: 36px; background-color: red; height: 30px;">' . $settings['bad'] . '</td>
-			</tr>
-		</table>
-		<div>		
-			<a href="index.php?page=research"><img src="images/another_tests.jpg" width="140px" border="0" alt="" /></a>&nbsp;&nbsp;&nbsp;
-			<a href="index.php?page=resume"><img src="images/to_reports.jpg" width="140px" border="0" alt="" /></a>&nbsp;&nbsp;&nbsp;	
-			<a href="index.php?page=results"><img src="images/to_results.jpg" width="140px" border="0" alt="" /></a>	
-		</div>';
+			<div>Индекс здоровья координирующего комплекса: ' . $score . '. </div>
+			<div>Заключение: ' . $summary . '</div>
+			<table width="100%">
+				<tr>
+					<td width="100px" style="text-align: center; color: white; font-size: 36px; background-color: green; height: 30px;">' . $settings['good'] . '</td>
+					<td width="100px" style="text-align: center; color: black; font-size: 36px; background-color: yellow; height: 30px;">' . $settings['middle'] . '</td>
+					<td width="100px" style="text-align: center; color: white; font-size: 36px; background-color: red; height: 30px;">' . $settings['bad'] . '</td>
+				</tr>
+			</table>
+			<div>
+				<a href="index.php?page=research"><img src="images/another_tests.jpg" width="140px" border="0" alt="" /></a>&nbsp;&nbsp;&nbsp;
+				<a href="index.php?page=resume"><img src="images/to_reports.jpg" width="140px" border="0" alt="" /></a>&nbsp;&nbsp;&nbsp;
+				<a href="index.php?page=results"><img src="images/to_results.jpg" width="140px" border="0" alt="" /></a>
+			</div>';
 	}
 }
