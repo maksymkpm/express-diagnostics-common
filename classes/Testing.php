@@ -15,6 +15,8 @@ class Testing {
 			case 4:
 			case 7: $score = self::CalculateCommonPaper($paper_id, self::substrString($answers)); break;
 
+			case 3: $score = self::CalculateComplexPaper($paper_id, self::substrString($answers)); break;
+
 			default: break;
 		}
 
@@ -34,15 +36,125 @@ class Testing {
 		return self::CalculateScore($paper_id, $scoreData['score']);
 	}
 
-	private static function CalculateScore($paper_id, $scoreRaw) {
-		switch ($paper_id) {
-			case 1: $score_max = 16; break;
-			case 2: $score_max = 13; break;
-			case 4: $score_max = 35; break;
-			case 7: $score_max = 7; break;
+	private static function CalculateComplexPaper($paper_id, string $answers) {
+		$group = [];
+		$group_number = 0;
+		$answer = explode(',', $answers);
+
+		foreach ($answer as $key => $value) {
+			foreach ((config::get('recommendation.' . $paper_id . '.groups')) as $group_id => $group_array) {
+				if (in_array($key, $group_array)) {
+					$group_number = $group_id;
+				}
+			}
+
+			$group[$group_number][$key] = $value;
 		}
 
-		if ($scoreRaw > $score_max ) {
+		$score = [];
+		for ($i = 1; $i <= config::get('recommendation.' . $paper_id . '.parts'); $i++) {	
+			$part = implode(',', $group[$i]);
+
+			$query = "	SELECT SUM(weight) AS score
+						FROM variants
+						WHERE variant_id IN (" . $part . ")";
+
+			$result = self::Database()
+						->select($query)
+						->execute()
+						->fetch();
+
+			$score[$i] = $result['score'];
+		}
+
+		return self::CalculateScore($paper_id, $score);
+	}
+
+	private static function CalculateScore($paper_id, $scoreRaw) {
+		if (in_array($paper_id, self::simplePapers())) {
+			$score = self::countScore($scoreRaw, config::get('recommendation.' . $paper_id . '.score_max'));
+		} else if (in_array($paper_id, self::complexPapers())) {
+			$score = [];
+
+			for ($i = 1; $i <= config::get('recommendation.' . $paper_id . '.parts'); $i++) {
+				$score[$i] = self::countScore($scoreRaw[$i], config::get('recommendation.' . $paper_id . '.' . $i . '.score_max'));
+			}
+		}
+
+		return $score;
+	}
+
+	private static function returnResults($paper_id, $score) {
+		$summary = '';
+		$settings = [];
+
+		if (in_array($paper_id, self::simplePapers())) {
+			if ($score == 0) {
+				$summary = config::get('recommendation.' . $paper_id . '.perfect');
+				$settings = ["good" => ":)", "middle" => "", "bad" => ""];
+			}
+			elseif (($score > 0) && ($score <= 0.33)) {
+				$summary = config::get('recommendation.' . $paper_id . '.good');
+				$settings = ["good" => ":)", "middle" => "", "bad" => ""];
+			}
+			elseif (($score > 0.33) && ($score <= 0.66)) {
+				$summary = config::get('recommendation.' . $paper_id . '.middle');
+				$settings = ["good" => "", "middle" => ":|", "bad" => ""];
+			}
+			elseif (($score > 0.66) && ($score <= 1)) {
+				$summary = config::get('recommendation.' . $paper_id . '.bad');
+				$settings = ["good" => "", "middle" => "", "bad" => ":("];
+			}
+
+		} else if (in_array($paper_id, self::complexPapers())) {
+			$final_score = 0;
+
+			for ($i = 1; $i <= config::get('recommendation.' . $paper_id . '.parts'); $i++) {
+				if ($score[$i] == 0) {
+					$summary .= config::get('recommendation.' . $paper_id . '.' . $i . '.perfect');
+				}
+				elseif (($score[$i] > 0) && ($score[$i] <= 0.33)) {
+					$summary .= config::get('recommendation.' . $paper_id . '.' . $i . '.good');
+				}
+				elseif (($score[$i] > 0.33) && ($score[$i] <= 0.66)) {
+					$summary .= config::get('recommendation.' . $paper_id . '.' . $i . '.middle');
+				}
+				elseif (($score[$i] > 0.66) && ($score[$i] <= 1)) {
+					$summary .= config::get('recommendation.' . $paper_id . '.' . $i . '.bad');
+				}
+
+				$final_score = $final_score + $score[$i];
+				var_dump($score[$i], $final_score);
+			}
+
+			$final_score = $final_score / config::get('recommendation.' . $paper_id . '.parts');
+
+			if ($final_score == 0) {
+				$settings = ["good" => ":)", "middle" => "", "bad" => ""];
+			}
+			elseif (($final_score > 0) && ($final_score <= 0.33)) {
+				$settings = ["good" => ":)", "middle" => "", "bad" => ""];
+			}
+			elseif (($final_score > 0.33) && ($final_score <= 0.66)) {
+				$settings = ["good" => "", "middle" => ":|", "bad" => ""];
+			}
+			elseif (($final_score > 0.66) && ($final_score <= 1)) {
+				$settings = ["good" => "", "middle" => "", "bad" => ":("];
+			}
+
+			$score = $final_score;
+
+		}
+
+		return self::returnSummary($score, $summary, $settings);
+	}
+
+	private static function substrString(string $string) {
+		return substr($string, 0, -1);
+	}
+
+	private static function countScore($scoreRaw, $score_max) {
+		if ($scoreRaw > $score_max) {
 			$score = 0;
 		} else {
 			$score = ($score_max  - $scoreRaw) / $score_max ;
@@ -51,31 +163,14 @@ class Testing {
 		return $score;
 	}
 
-	private static function returnResults($paper_id, $score) {
-		$summary = '';
-
-		if ($score == 0) {
-			$summary = config::get('recommendation.' . $paper_id . '.perfect');
-			$settings = ["good" => ":)", "middle" => "", "bad" => ""];
-		}
-		elseif (($score > 0) && ($score <= 0.33)) {
-			$summary = config::get('recommendation.' . $paper_id . '.good');
-			$settings = ["good" => ":)", "middle" => "", "bad" => ""];
-		}
-		elseif (($score > 0.33) && ($score <= 0.66)) {
-			$summary = config::get('recommendation.' . $paper_id . '.middle');
-			$settings = ["good" => "", "middle" => ":|", "bad" => ""];
-		}
-		elseif (($score > 0.66) && ($score <= 1)) {
-			$summary = config::get('recommendation.' . $paper_id . '.bad');
-			$settings = ["good" => "", "middle" => "", "bad" => ":("];
-		}
-
-		return self::returnSummary($score, $summary, $settings);
+	// тесты без вложенностей
+	private static function simplePapers() {
+		return [1,2,4,7];
 	}
 
-	private static function substrString(string $string) {
-		return substr($string, 0, -1);
+	// тесты с вложенностью
+	private static function complexPapers() {
+		return [3,5];
 	}
 
 	/*
