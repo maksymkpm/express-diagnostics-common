@@ -14,11 +14,12 @@ class Testing {
 			case 2:
 			case 4:
 			case 7: $score = self::CalculateCommonPaper($paper_id, self::substrString($answers)); break;
+			
+			case 9: $score = self::CalculateAbstract($paper_id, self::substrString($answers)); break;
 
 			case 3: 
 			case 5:
-			case 6:
-			$score = self::CalculateComplexPaper($paper_id, self::substrString($answers)); break;
+			case 6: $score = self::CalculateComplexPaper($paper_id, self::substrString($answers)); break;
 
 			default: break;
 		}
@@ -70,6 +71,21 @@ class Testing {
 			$score[$i] = $result['score'];
 		}
 
+		return self::CalculateScore($paper_id, $score);
+	}
+	
+	private static function CalculateAbstract($paper_id, string $answers) {
+		$correct_answers = [21,6,3,29,4];
+		
+		$answers = explode(',', $answers);
+		$score = 0;
+		
+		foreach ($answers as $key => $value) {
+			if ($value == $correct_answers[$key]) {
+				$score++;
+			}
+		}
+		
 		return self::CalculateScore($paper_id, $score);
 	}
 
@@ -189,7 +205,7 @@ class Testing {
 
 	// тесты без вложенностей
 	private static function simplePapers() {
-		return [1,2,4,7];
+		return [1,2,4,7,9];
 	}
 
 	// тесты с вложенностью
@@ -202,20 +218,20 @@ class Testing {
 
 	*/
 	private static function returnSummary($score, $summary, $settings) {
-		return '
-			<div>Результаты тестирования: ' . $score . '. </div>
-			<div>Заключение: ' . $summary . '</div>
-			<table width="100%">
-				<tr>
-					<td width="100px" style="text-align: center; color: white; font-size: 36px; background-color: green; height: 30px;">' . $settings['good'] . '</td>
-					<td width="100px" style="text-align: center; color: black; font-size: 36px; background-color: yellow; height: 30px;">' . $settings['middle'] . '</td>
-					<td width="100px" style="text-align: center; color: white; font-size: 36px; background-color: red; height: 30px;">' . $settings['bad'] . '</td>
-				</tr>
-			</table>
-			<div>
-				<a href="index.php?page=research"><img src="images/another_tests.jpg" width="140px" border="0" alt="" /></a>&nbsp;&nbsp;&nbsp;
-				<a href="index.php?page=resume"><img src="images/to_reports.jpg" width="140px" border="0" alt="" /></a>&nbsp;&nbsp;&nbsp;
-				<a href="index.php?page=results"><img src="images/to_results.jpg" width="140px" border="0" alt="" /></a>
-			</div>';
+		$replace = [
+			'{score}' => $score,
+			'{summary}' => $summary,
+			'{good}' => $settings['good'],
+			'{middle}' => $settings['middle'],
+			'{bad}' => $settings['bad'],
+		];
+		
+		$response = file_get_contents('../templates/test_result.html', true);
+		
+		foreach ($replace as $placeholder => $value) {
+			$response = str_replace($placeholder, $value, $response);
+		}
+		
+		return $response;
 	}
 }
