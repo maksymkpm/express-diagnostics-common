@@ -36,7 +36,7 @@ class Testing {
 			'result_text' => $response['summary'],
 			'score' => $response['score'],
 			'date' => \db::expression('UTC_TIMESTAMP()'),
-			'attempt' => 1,
+			//need check attempt in session
 		];
 		
 		self::SaveResults($data);
@@ -312,6 +312,29 @@ class Testing {
 	}
 	
 	private static function SaveResults(array $data) {
+		//identify attempt, need check from session first
+		
+		$query = "	SELECT attempt 
+					FROM personal_results
+					WHERE member_id = :member_id
+					AND paper_id = :paper_id
+					ORDER BY date DESC LIMIT 1";
+		
+		$result = self::Database()
+			->select($query)
+			->binds('member_id', $data['member_id'])
+			->binds('paper_id', $data['paper_id'])
+			->execute()
+			->fetch();
+			
+		if (empty($result)) {
+			$data['attempt'] = 1;
+		} else {
+			$data['attempt'] = $result['attempt'] + 1;
+		}
+		
+		//check if member to attempt exist
+		
 		return $response = self::Database()
 			->insert('personal_results')
 			->values($data)
