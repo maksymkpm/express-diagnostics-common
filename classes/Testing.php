@@ -15,7 +15,9 @@ class Testing {
 			case 4:
 			case 7: $score = self::CalculateCommonPaper($paper_id, self::substrString($answers)); break;
 
-			case 3: $score = self::CalculateComplexPaper($paper_id, self::substrString($answers)); break;
+			case 3: 
+			case 5:
+			$score = self::CalculateComplexPaper($paper_id, self::substrString($answers)); break;
 
 			default: break;
 		}
@@ -77,7 +79,11 @@ class Testing {
 			$score = [];
 
 			for ($i = 1; $i <= config::get('recommendation.' . $paper_id . '.parts'); $i++) {
-				$score[$i] = self::countScore($scoreRaw[$i], config::get('recommendation.' . $paper_id . '.' . $i . '.score_max'));
+				if (($paper_id == 5) && (in_array($i, [3,4]))) {
+					$score[$i] = self::countSpecialScore($scoreRaw[$i]);
+				} else {
+					$score[$i] = self::countScore($scoreRaw[$i], config::get('recommendation.' . $paper_id . '.' . $i . '.score_max'));
+				}
 			}
 		}
 
@@ -124,21 +130,24 @@ class Testing {
 				}
 
 				$final_score = $final_score + $score[$i];
-				var_dump($score[$i], $final_score);
 			}
-
+var_dump($score);
 			$final_score = $final_score / config::get('recommendation.' . $paper_id . '.parts');
-
+var_dump($final_score);
 			if ($final_score == 0) {
+				$summary = config::get('recommendation.' . $paper_id . '.general.perfect') . $summary;
 				$settings = ["good" => ":)", "middle" => "", "bad" => ""];
 			}
 			elseif (($final_score > 0) && ($final_score <= 0.33)) {
+				$summary = config::get('recommendation.' . $paper_id . '.general.good') . $summary;
 				$settings = ["good" => ":)", "middle" => "", "bad" => ""];
 			}
 			elseif (($final_score > 0.33) && ($final_score <= 0.66)) {
+				$summary = config::get('recommendation.' . $paper_id . '.general.middle') . $summary;
 				$settings = ["good" => "", "middle" => ":|", "bad" => ""];
 			}
 			elseif (($final_score > 0.66) && ($final_score <= 1)) {
+				$summary = config::get('recommendation.' . $paper_id . '.general.bad') . $summary;
 				$settings = ["good" => "", "middle" => "", "bad" => ":("];
 			}
 
@@ -160,6 +169,20 @@ class Testing {
 			$score = ($score_max  - $scoreRaw) / $score_max ;
 		}
 
+		return $score;
+	}
+	
+	private static function countSpecialScore($scoreRaw) {
+		if ($scoreRaw <= 5) {
+			$score = (5 - $scoreRaw)/5;
+		}
+		elseif (($scoreRaw > 5) && ($scoreRaw <= 7)) {
+			$score = 0;
+		}
+		elseif (($scoreRaw > 7) && ($scoreRaw <= 12)){
+			$score = ($scoreRaw - 7)/5;
+		}
+		
 		return $score;
 	}
 
