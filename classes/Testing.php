@@ -10,38 +10,16 @@ class Testing {
 
 	public static function CountResults($paper_id, string $questions, string $answers) {
 		switch ($paper_id) {
-			case 1: $score = self::CalculatePaper1(self::substrString($answers)); break;
-			
+			case 1:
+			case 2: $score = self::CalculateCommonPaper($paper_id, self::substrString($answers)); break;
+
 			default: break;
 		}
 
 		return self::returnResults($paper_id, $score);
 	}
 
-	private static function returnResults($paper_id, $score) {
-		$summary = '';
-
-		if ($score == 0) {
-			$summary = config::get('recommendation.1.perfect');
-			$settings = ["good" => ":)", "middle" => "", "bad" => ""];
-		}
-		elseif (($score > 0) && ($score <= 0.33)) {
-			$summary = config::get('recommendation.1.good');
-			$settings = ["good" => ":)", "middle" => "", "bad" => ""];
-		}
-		elseif (($score > 0.33) && ($score <= 0.66)) {
-			$summary = config::get('recommendation.1.middle');
-			$settings = ["good" => "", "middle" => ":|", "bad" => ""];
-		}
-		elseif (($score > 0.66) && ($score <= 1)) {
-			$summary = config::get('recommendation.1.bad');
-			$settings = ["good" => "", "middle" => "", "bad" => ":("];
-		}
-
-		return self::returnSummary($score, $summary, $settings);
-	}
-
-	private static function CalculatePaper1(string $answers) {
+	private static function CalculateCommonPaper($paper_id, string $answers) {
 		$query = "	SELECT SUM(weight) AS score
 					FROM variants
 					WHERE variant_id IN (" . $answers . ")";
@@ -51,13 +29,45 @@ class Testing {
 					->execute()
 					->fetch();
 
-		if ($scoreData['score'] > 16) {
+		return self::CalculateScore($paper_id, $scoreData['score']);
+	}
+
+	private static function CalculateScore($paper_id, $scoreRaw) {
+		switch ($paper_id) {
+			case 1: $score_max = 16; break;
+			case 2: $score_max = 13; break;
+		}
+
+		if ($scoreRaw > $score_max ) {
 			$score = 0;
 		} else {
-			$score = (16 - $scoreData['score']) / 16;
+			$score = ($score_max  - $scoreRaw) / $score_max ;
 		}
 
 		return $score;
+	}
+
+	private static function returnResults($paper_id, $score) {
+		$summary = '';
+
+		if ($score == 0) {
+			$summary = config::get('recommendation.' . $paper_id . '.perfect');
+			$settings = ["good" => ":)", "middle" => "", "bad" => ""];
+		}
+		elseif (($score > 0) && ($score <= 0.33)) {
+			$summary = config::get('recommendation.' . $paper_id . '.good');
+			$settings = ["good" => ":)", "middle" => "", "bad" => ""];
+		}
+		elseif (($score > 0.33) && ($score <= 0.66)) {
+			$summary = config::get('recommendation.' . $paper_id . '.middle');
+			$settings = ["good" => "", "middle" => ":|", "bad" => ""];
+		}
+		elseif (($score > 0.66) && ($score <= 1)) {
+			$summary = config::get('recommendation.' . $paper_id . '.bad');
+			$settings = ["good" => "", "middle" => "", "bad" => ":("];
+		}
+
+		return self::returnSummary($score, $summary, $settings);
 	}
 
 	private static function substrString(string $string) {
