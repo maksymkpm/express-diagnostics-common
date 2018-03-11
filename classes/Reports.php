@@ -23,7 +23,7 @@ class Reports {
 	}
 
 	//personal results for results page
-	public static function getPersonalResults(int $member_id) {
+	public static function listPersonalResults(int $member_id) {
 		$query = "	SELECT p.paper_name, pr.score, pr.result_text, pr.date, r.research_name, r.image
 					FROM personal_results pr
 					LEFT JOIN papers p ON p.paper_id = pr.paper_id
