@@ -38,7 +38,7 @@ class Attempt {
 			->execute();
 	}
 	
-	//creates new attempt
+	//updates status of attempt
 	public static function updateAttempt(int $member_id, int $attempt) {
 		$result = self::Database()
 			->update('member_to_attempt')
