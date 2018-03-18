@@ -23,7 +23,7 @@ class Attempt {
 
 		return $data;
 	}
-	
+
 	//creates new attempt
 	public static function createAttempt(int $member_id, int $attempt) {
 		$data = [
@@ -32,12 +32,12 @@ class Attempt {
 			'status' => 'progress',
 			'date' => \db::expression('UTC_TIMESTAMP()'),
 		];
-		
+
 		return self::Database()->insert('member_to_attempt')
 			->values($data)
 			->execute();
 	}
-	
+
 	//updates status of attempt
 	public static function updateAttempt(int $member_id, int $attempt) {
 		$result = self::Database()
@@ -49,7 +49,22 @@ class Attempt {
 			->binds('member_id', $member_id)
 			->binds('attempt', $attempt)
 			->execute();
-			
+
+		return $result;
+	}
+
+	//finish attempt
+	public static function finishAttempt(int $member_id, int $attempt) {
+		$result = self::Database()
+			->update('member_to_attempt')
+			->values([
+				'status' => 'done',
+			])
+			->where('member_id = :member_id AND attempt = :attempt')
+			->binds('member_id', $member_id)
+			->binds('attempt', $attempt)
+			->execute();
+
 		return $result;
 	}
 }
