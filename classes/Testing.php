@@ -34,6 +34,7 @@ class Testing {
 			'research_id' => $_SESSION['research']['research_id'],
 			'paper_id' => $paper_id,
 			'result_text' => $response['summary'],
+			'answers' => self::substrString($answers),
 			'score' => $response['score'],
 			'date' => \db::expression('UTC_TIMESTAMP()'),
 			'attempt' => $_SESSION['attempt'], //need check attempt in session
