@@ -18,6 +18,36 @@ class Reports {
 		$this->data = $data;
 	}
 
+	public static function getReport(int $attempt = 0) {
+		$query = "	SELECT report, started, finished
+					FROM member_to_attempt
+					WHERE attempt = :attempt
+					ORDER BY started DESC LIMIT 1";
+
+		$data = self::Database()
+					->select($query)
+					->binds('attempt', $attempt)
+					->execute()
+					->fetch();
+
+		if (empty($data['report'])) {
+			return self::finalizeReport($attempt);
+		}
+
+		return unserialize($data['report']);
+	}
+	
+	public static function finalizeReport(int $attempt = 0) {
+		$report = Reports::calculateIndexes($attempt);
+		$serialize = serialize($report);
+
+		if (isset($report->data['index']) && $report->data['index'] != null) {
+			Attempt::finishAttempt($_SESSION['member']['member_id'], $attempt, $serialize);
+		}
+		
+		return $report;
+	}
+
 	public static function calculateIndexes(int $attempt = 0) {
 		$data = self::checkReport($_SESSION['member']['member_id'], $attempt);
 

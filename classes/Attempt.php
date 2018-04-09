@@ -10,10 +10,10 @@ class Attempt {
 
 	//get the last attempt with status
 	public static function getLastAttempt(int $member_id) {
-		$query = "	SELECT attempt, status, date
+		$query = "	SELECT attempt, status, started
 					FROM member_to_attempt
 					WHERE member_id = :member_id
-					ORDER BY date DESC LIMIT 1";
+					ORDER BY started DESC LIMIT 1";
 
 		$data = self::Database()
 					->select($query)
@@ -30,7 +30,7 @@ class Attempt {
 			'member_id' => $member_id,
 			'attempt' => $attempt,
 			'status' => 'progress',
-			'date' => \db::expression('UTC_TIMESTAMP()'),
+			'started' => \db::expression('UTC_TIMESTAMP()'),
 		];
 
 		return self::Database()->insert('member_to_attempt')
@@ -54,11 +54,13 @@ class Attempt {
 	}
 
 	//finish attempt
-	public static function finishAttempt(int $member_id, int $attempt) {
+	public static function finishAttempt(int $member_id, int $attempt, $report) {
 		$result = self::Database()
 			->update('member_to_attempt')
 			->values([
+				'report' => $report,
 				'status' => 'done',
+				'finished' => \db::expression('UTC_TIMESTAMP()'),
 			])
 			->where('member_id = :member_id AND attempt = :attempt')
 			->binds('member_id', $member_id)
