@@ -110,60 +110,30 @@ class Member {
 	}
 
     /**
-     * @param MemberCreate $property
-     * @return Member|null
      */
-    public static function Create(\RequestParameters\MemberCreate $property): ?Member {
-		if (empty($property)) {
+    public static function Create(array $member) {
+		if (empty($member)) {
 			throw new \RuntimeException('Member data is empty.');
 		}
-
-		$member = [
-			'gender' => $property->gender,
-			'bdate' => $property->bdate,
-			'status' => self::STATUS_NEW,
-			'last_login' => \db::expression('UTC_TIMESTAMP()'),
-			'date_added' => \db::expression('UTC_TIMESTAMP()'),
-		];
-
-		$password = $property->password;
-		if (empty($property->password)) {
-			$password = self::tokenCreate();
-		}
-
+		
 		$memberDetails = [
-			'profile' => $property->profile,
-			'username' => $property->username,
-			'password' => password_hash($password, PASSWORD_BCRYPT),
-			'status' => self::STATUS_NEW,
-			'token' => self::tokenCreate(),
-			'token_expiry' => self::tokenExpiry(),
-			'last_login' => \db::expression('UTC_TIMESTAMP()'),
-			'date_added' => \db::expression('UTC_TIMESTAMP()'),
+			'fname' => $member['fname'],
+			'sname' => $member['sname'],
+			'lname' => $member['lname'],
+			'birth' => $member['birth'],
+			'sex' =>$member['sex'],
+			'username' => $member['username'],
+			'password' => base64_encode($member['password']),
+			'user_type' => 0,
+			'date' => \db::expression('UTC_TIMESTAMP()'),
 		];
+//var_dump($memberDetails); exit;
+		//new \FormValidation($memberDetails, 'MemberCreate');
 
-		new \FormValidation($memberDetails, 'MemberCreate');
-
-		self::Database()->begin();
-
-		self::Database()
-			->insert('member')
-			->values($member)
-			->execute();
-
-		$memberDetails['member_id'] = self::Database()->last_insert_id();
-
-		self::Database()
-			->insert('member_profile')
+		return self::Database()
+			->insert('members')
 			->values($memberDetails)
 			->execute();
-
-		self::Database()->commit();
-
-		return new self([
-			'member_id' => $memberDetails['member_id'],
-			'token' => $memberDetails['token'],
-		]);
 	}
 
     /**
@@ -243,7 +213,6 @@ class Member {
 		return $result['member_id'];
 	}
 
-//
 	public static function Auth(string $username, string $password): ?Member {
 		$query = "	SELECT member_id, sname, fname, lname 
 					FROM members
