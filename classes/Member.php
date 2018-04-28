@@ -124,7 +124,7 @@ class Member {
 			'sex' =>$member['sex'],
 			'username' => $member['username'],
 			'password' => base64_encode($member['password']),
-			'user_type' => 0,
+			'validated' => 0,
 			'date' => \db::expression('UTC_TIMESTAMP()'),
 		];
 //var_dump($memberDetails); exit;

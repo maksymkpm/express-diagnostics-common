@@ -18,6 +18,22 @@ class Reports {
 		$this->data = $data;
 	}
 
+	public static function listReports() {
+		$query = "	SELECT attempt,finished
+					FROM member_to_attempt
+					WHERE member_id = :member_id
+					AND status = 'done'
+					ORDER BY finished DESC";
+
+		$data = self::Database()
+					->select($query)
+					->binds('member_id', $_SESSION['member']['member_id'])
+					->execute()
+					->fetch_all();
+
+		return $data;
+	}
+
 	public static function getReport(int $attempt = 0) {
 		$query = "	SELECT report, started, finished
 					FROM member_to_attempt
